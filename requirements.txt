@@ -64,3 +64,4 @@ gunicorn
 celery
 getmac
 Pillow
+mysql-connector-python

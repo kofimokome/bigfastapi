@@ -23,6 +23,11 @@ BASE_URL = config("BASE_URL")
 FILES_BASE_FOLDER = config('FILES_BASE_FOLDER')
 LANDING_PAGE_FORM_PATH = config('LANDING_PAGE_FORM_PATH')
 LANDING_PAGE_FOLDER = config("LANDING_PAGE_FOLDER")
+DB_NAME = config("DB_NAME")
+DB_USER = config("DB_USER")
+DB_PASSWORD = config("DB_PASSWORD")
+DB_HOST = config("DB_HOST")
+DB_TYPE = config("DB_TYPE")
 
 # EMAIL_VERIFICATION_TEMPLATE="email/welcome_email.html"
 # PASSWORD_RESET_TEMPLATE="email/password_reset.html"
