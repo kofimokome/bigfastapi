@@ -1,8 +1,15 @@
 import argparse
+import os
 from datetime import datetime
+
+from dotenv import load_dotenv
 
 from bigfastapi.core.Command import Command
 from ..print_colors import bcolors
+
+load_dotenv('.env')
+
+MIGRATIONS_FOLDER = os.environ.get("MIGRATIONS_FOLDER")
 
 
 def to_camel_case(snake_str: str) -> str:
@@ -69,6 +76,6 @@ class ''' + class_name + ''':
 '''
         file_name = "_" + str(now.year) + '_' + str(now.month).zfill(2) + '_' + str(now.day).zfill(2) + '_' + str(
             now.hour).zfill(2) + str(now.minute).zfill(2) + str(now.second).zfill(2) + '_' + migration_name + '.py'
-        file = open('migrations/' + file_name, 'a')
+        file = open(MIGRATIONS_FOLDER + file_name, 'a')
         file.write(contents)
-        print(bcolors.OKGREEN + "Migration file migrations/" + file_name + ' created')
+        print(bcolors.OKGREEN + "Migration file " + MIGRATIONS_FOLDER + file_name + ' created')

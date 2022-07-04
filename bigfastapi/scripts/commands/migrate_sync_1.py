@@ -9,7 +9,6 @@ from dotenv import load_dotenv
 
 from bigfastapi.core.Command import Command
 from bigfastapi.core.DB import DB
-from .utils import create_migrations_table, get_db_migrations, get_migration_files, get_max_batch_number
 from ..print_colors import bcolors
 
 load_dotenv('.env')
@@ -17,20 +16,20 @@ load_dotenv('.env')
 MIGRATIONS_FOLDER = os.environ.get("MIGRATIONS_FOLDER")
 
 
-class MigrateHelper(Command):
+class MigrateSync1Helper(Command):
 
     def run(self, args: list = None):
         try:
-            create_migrations_table()
+            self.create_migrations_table()
         except Exception:
             pass
 
-        db_migration_files = get_db_migrations()
+        db_migration_files = self.get_db_migrations()
         db_migration_files = [x[1] for x in db_migration_files]
-        migration_files = get_migration_files(MIGRATIONS_FOLDER)
+        migration_files = self.get_migration_files()
         files_to_migrate = [x for x in migration_files if x[:-3] not in db_migration_files]
         # print("to migrate is ", files_to_migrate)
-        batch_number = get_max_batch_number()
+        batch_number = self.get_max_batch_number()
         if batch_number is None:
             batch_number = 0
 
@@ -59,6 +58,40 @@ class MigrateHelper(Command):
                     print(bcolors.FAIL + "migrating " + file_name + " failed " + bcolors.ENDC)
                     print(e)
                     exit()
+        print(bcolors.OKGREEN + "Sync complete. You can run bigfastapi migrate " + bcolors.ENDC)
+
+    def get_migration_files(self):
+        mypath = 'migrations/'
+        pkgdir = sys.modules['bigfastapi'].__path__[0]
+        fullpath = os.path.join(pkgdir, mypath)
+        migration_files = [f for f in listdir(fullpath) if isfile(join(fullpath, f))]
+        migration_files = [x for x in migration_files if x[0] != '.']
+        migration_files = [x for x in migration_files if x[0] != '__']
+        migration_files = [x for x in migration_files if x != '__init__.py']
+        migration_files.sort()
+        return migration_files
+
+    def create_migrations_table(self):
+        connection = DB.get_cursor()
+        query = "CREATE TABLE IF NOT EXISTS `migrations` (`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY, `migration` VARCHAR(255) NOT NULL , `batch` INT NOT NULL) "
+        connection.execute(query)
+        connection.close()
+
+    def get_db_migrations(self) -> list:
+        connection = DB.get_cursor()
+        query = "SELECT * FROM migrations"
+        connection.execute(query)
+        migrations = list(connection)
+        connection.close()
+        return migrations
+
+    def get_max_batch_number(self):
+        connection = DB.get_cursor()
+        query = "SELECT max(batch) FROM migrations"
+        connection.execute(query)
+        result = list(connection)[0][0]
+        connection.close()
+        return result
 
     def update_migrations(self, batch_number, migration_file):
         connection = DB.get_cursor()

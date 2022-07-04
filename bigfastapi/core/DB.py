@@ -1,13 +1,16 @@
+import os
+
 import mysql.connector
 import mysql.connector.cursor
-from decouple import config
+from dotenv import load_dotenv
 
+load_dotenv('.env')
 
-DB_NAME = 'cpmeapi'
-DB_USER = 'root'
-DB_PASSWORD = 'root'
-DB_HOST = 'localhost'
-DB_PORT = '3306'
+DB_NAME = os.environ.get("DB_NAME")
+DB_USER = os.environ.get("DB_USER")
+DB_PASSWORD = os.environ.get("DB_PASSWORD")
+DB_HOST = os.environ.get("DB_HOST")
+DB_PORT = os.environ.get("DB_PORT")
 
 
 class DB:
