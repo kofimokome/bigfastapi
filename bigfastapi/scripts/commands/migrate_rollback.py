@@ -12,34 +12,6 @@ from bigfastapi.core.DB import DB
 from ..print_colors import bcolors
 
 
-def import_module(name, package=None):
-    """An approximate implementation of import."""
-    absolute_name = importlib.util.resolve_name(name, package)
-    try:
-        return sys.modules[absolute_name]
-    except KeyError:
-        pass
-
-    path = None
-    if '.' in absolute_name:
-        parent_name, _, child_name = absolute_name.rpartition('.')
-        parent_module = import_module(parent_name)
-        path = parent_module.__spec__.submodule_search_locations
-    for finder in sys.meta_path:
-        spec = finder.find_spec(absolute_name, path)
-        if spec is not None:
-            break
-    else:
-        msg = f'No module named {absolute_name!r}'
-        raise ModuleNotFoundError(msg, name=absolute_name)
-    module = importlib.util.module_from_spec(spec)
-    sys.modules[absolute_name] = module
-    spec.loader.exec_module(module)
-    if path is not None:
-        setattr(parent_module, child_name, module)
-    return module
-
-
 class MigrateRollBackHelper(Command):
 
     def run(self, args: list = None):
@@ -66,7 +38,11 @@ class MigrateRollBackHelper(Command):
                 function_name = file_name.split('_')
                 function_name = [x.title() for x in function_name if not x.isnumeric()]
                 function_name = ''.join(function_name)
-                module = import_module('migrations.' + file_name, function_name)
+                # module = importlib.import_module('migrations.' + file_name, function_name)
+                spec = importlib.util.spec_from_file_location("migrations", "migrations/" + migration_file + ".py")
+                module = importlib.util.module_from_spec(spec)
+                sys.modules["migrations"] = module
+                spec.loader.exec_module(module)
                 class_name = getattr(module, function_name)
                 try:
                     class_name().down()
@@ -84,6 +60,7 @@ class MigrateRollBackHelper(Command):
         migration_files = [f for f in listdir(mypath) if isfile(join(mypath, f))]
         migration_files = [x for x in migration_files if x[0] != '.']
         migration_files = [x for x in migration_files if x[0] != '__']
+        migration_files = [x for x in migration_files if x != '__init__.py']
         migration_files.sort()
         return migration_files
 
@@ -111,7 +88,7 @@ class MigrateRollBackHelper(Command):
 
     def update_migrations(self, migration_file):
         connection = DB.get_cursor()
-        query = "DELETE FROM drowsiness_detection.migrations WHERE migration = '{}'".format(migration_file)
+        query = "DELETE FROM migrations WHERE migration = '{}'".format(migration_file)
 
         connection.execute(query)
         db = DB.get_db()

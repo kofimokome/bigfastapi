@@ -18,7 +18,7 @@ class MakeHelper(Command):
         components = snake_str.split('_')
         class_name = components[0].title() + ''.join(x.title() for x in components[1:]) + 'Helper'
 
-        contents = '''from core.Command import Command
+        contents = '''from bigfastapi.core.Command import Command
 
 
 class ''' + class_name + '''(Command):
@@ -26,6 +26,6 @@ class ''' + class_name + '''(Command):
     def run(self, args: list = None):
         print("args are ", args)
 '''
-        file = open('helpers/commands/' + file_name, 'a')
+        file = open('bigfastapi/scripts/commands/' + file_name, 'a')
         file.write(contents)
         print(bcolors.OKGREEN + "Helper created at helpers/commands/" + file_name + ' created')

@@ -1,4 +1,5 @@
 import setuptools
+# python setup.py install
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
@@ -10,7 +11,7 @@ setuptools.setup(
     author_email="support@bigfa.st",
     entry_points='''
        [console_scripts]
-       cooltool=bigfastapi.scripts.main:main 
+       bigfastapi=bigfastapi.scripts.main:main 
        ''',
     description="Adding lots of functionality to FastAPI",
     long_description=long_description,
@@ -26,8 +27,7 @@ setuptools.setup(
                                                 'bigfastapi.scripts',
                                                 'bigfastapi.scripts.commands',
                                                 'bigfastapi.scripts.core',
-                                                'bigfastapi.data',
-                                                'migrations']),
+                                                'bigfastapi.data']),
 
     classifiers=[
         "Programming Language :: Python :: 3",

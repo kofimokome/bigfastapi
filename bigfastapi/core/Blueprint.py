@@ -1,5 +1,6 @@
 from .Column import Column
 
+
 class Blueprint:
 
     def __init__(self, is_update: bool = False):
@@ -75,5 +76,5 @@ class Blueprint:
         query = ",".join(query)
         return query
 
-    def get_columns(self) -> list[Column]:
+    def get_columns(self):
         return self.columns

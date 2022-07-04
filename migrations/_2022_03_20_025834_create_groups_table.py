@@ -1,9 +1,8 @@
-from core.Blueprint import Blueprint as Blueprint
-from core.Migration import Migration
-from core.Schema import Schema
+from bigfastapi.core.Blueprint import Blueprint as Blueprint
+from bigfastapi.core.Schema import Schema
 
 
-class CreateGroupsTable(Migration):
+class CreateGroupsTable:
 
     def schema(self, table: Blueprint):
         table.id()

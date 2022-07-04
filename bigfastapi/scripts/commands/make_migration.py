@@ -34,11 +34,10 @@ class MakeMigrationHelper(Command):
         class_name = to_camel_case(migration_name)
         if update:
             contents = '''from bigfastapi.core.Blueprint import Blueprint as Blueprint
-from bigfastapi.core.Migration import Migration
 from bigfastapi.core.Schema import Schema
 
 
-class ''' + class_name + '''(Migration):
+class ''' + class_name + ''':
 
     def up_schema(self, table: Blueprint):
         table.string('column_name')
@@ -54,11 +53,10 @@ class ''' + class_name + '''(Migration):
 '''
         else:
             contents = '''from bigfastapi.core.Blueprint import Blueprint as Blueprint
-from bigfastapi.core.Migration import Migration
 from bigfastapi.core.Schema import Schema
 
 
-class ''' + class_name + '''(Migration):
+class ''' + class_name + ''':
 
     def schema(self, table: Blueprint):
         table.id()
