@@ -71,6 +71,12 @@ class Blueprint:
         column = Column(name=name, new_name=new_name, is_rename=True)
         self.columns.append(column)
 
+    def foreign(self, column_name) -> Column:
+        column = Column(name='', attributes=['FOREIGN KEY (`' + column_name + '`)'], is_foreign=True,
+                        is_update=self.is_update)
+        self.columns.append(column)
+        return column
+
     def to_string(self) -> str:
         query = [x.to_string() for x in self.columns]
         query = ",".join(query)

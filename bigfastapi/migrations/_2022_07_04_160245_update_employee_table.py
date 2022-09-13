@@ -9,8 +9,8 @@ class UpdateEmployeeTable:
         table.rename('name', 'new_name')
 
     def down_schema(self, table: Blueprint):
-        table.drop('new_name')
-        table.rename('new_nane', 'name')
+        table.drop('new_one')
+        table.rename('new_name', 'name')
 
     def up(self):
         Schema.update(table_name="employees", schema=self.up_schema)

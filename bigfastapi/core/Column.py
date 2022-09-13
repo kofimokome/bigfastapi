@@ -2,15 +2,18 @@ class Column:
 
     def __init__(self, name: str, attributes: list = [], is_change: bool = False, is_update: bool = False,
                  is_delete: bool = False,
-                 is_rename: bool = False, new_name: str = ''):
+                 is_rename: bool = False, is_foreign: bool = False, new_name: str = ''):
         self.name = name
-        attributes.append('NOT NULL')
+        if not is_foreign:
+            attributes.append('NOT NULL')
         self.attributes = attributes
         self.is_rename = is_rename
         self.is_delete = is_delete
         self.is_update = is_update
         self.is_change = is_change
         self.new_name = new_name
+        self.is_foreign = is_foreign
+        self.reference_column = ''
 
     def nullable(self):
         if 'NOT NULL' in self.attributes:
@@ -30,8 +33,7 @@ class Column:
     def unsigned(self):
         if 'SIGNED' in self.attributes:
             self.attributes.remove('SIGNED')
-
-        self.attributes.append('UNSIGNED')
+        self.attributes.insert(len(self.attributes) - 1, "UNSIGNED")
         return self
 
     def primary(self):
@@ -43,6 +45,22 @@ class Column:
 
     def auto_increment(self):
         self.attributes.append('AUTO INCREMENT')
+        return self
+
+    def references(self, column_name: str):
+        self.reference_column = column_name
+        return self
+
+    def on(self, table_name: str):
+        self.attributes.append('REFERENCES `' + table_name + '`(`' + self.reference_column + '`)')
+        return self
+
+    def onDelete(self, option: str):
+        self.attributes.append('ON DELETE ' + option)
+        return self
+
+    def onUpdate(self, option: str):
+        self.attributes.append('ON UPDATE ' + option)
         return self
 
     def default(self, value: str):
@@ -64,11 +82,16 @@ class Column:
         if self.is_delete:
             return ' DROP COLUMN `' + self.name + '`'
         elif self.is_update:
-            return ' ADD `' + self.name + '` ' + (' '.join(self.attributes))
+            if self.is_foreign:
+                return ' ADD ' + (' '.join(self.attributes))
+            else:
+                return ' ADD `' + self.name + '` ' + (' '.join(self.attributes))
         elif self.is_change:
             return ' CHANGE `' + self.name + '` `' + self.new_name + '`' + (' '.join(self.attributes))
         elif self.is_rename:
             return ' RENAME COLUMN `' + self.name + '` TO `' + self.new_name + '`'
+        elif self.is_foreign:
+            return (' '.join(self.attributes))
         else:
             column = '`' + self.name + '` '
             column += (' '.join(self.attributes))

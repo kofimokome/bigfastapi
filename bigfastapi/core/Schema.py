@@ -9,6 +9,7 @@ class Schema:
         table = Blueprint()
         schema(table=table)
         connection = DB.get_cursor()
+        print(table.to_string())
         query = "CREATE TABLE IF NOT EXISTS `" + table_name + '` (' + table.to_string() + ')'
 
         connection.execute(query)
@@ -22,6 +23,7 @@ class Schema:
         for column in columns:
             connection = DB.get_cursor()
             query = "ALTER TABLE `" + table_name + '`' + column.to_string()
+            print(query)
 
             connection.execute(query)
             connection.close()
